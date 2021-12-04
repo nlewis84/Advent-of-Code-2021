@@ -29,29 +29,62 @@ const WINNING_COMBINATIONS = [
 ]
 
 function checkSingleBoardForWinner(board) { 
-  let winner = false;
-  console.log(board);
-  
-  exit_loops:
   for (let i = 0; i < WINNING_COMBINATIONS.length; i++) {
+    let winner = [];
 
-    exit_combo:
     for (let j = 0; j < WINNING_COMBINATIONS[i].length; j++) {
-      // console.log("2nd for: ", winner);
-      console.log(board[WINNING_COMBINATIONS[i][j]])
+
       if (!board[WINNING_COMBINATIONS[i][j]].called) {
-        // console.log('if: ', winner);
-        winner = false;
-        break exit_combo;
+        winner.push(false);
+      } else {
+        winner.push(true);
       }
-console.log("it's true!!!")
-      winner = true;
-      return winner;
-      break exit_loops;
+
+      if (j === WINNING_COMBINATIONS[i].length - 1 && winner.every(v => v === true)) { 
+        console.log("THERES A WINNER"); 
+        return winner; 
+      } else { 
+        console.log("......no winner.... :("); return false
+      }
     }
-
+    // console.log(winner);
   }
-
 }
 
+// console.log(checkSingleBoardForWinner(boards[0]))
+
 checkSingleBoardForWinner(boards[0]);
+
+// boards[0][0].called = true;
+// boards[0][1].called = true;
+// boards[0][2].called = true;
+// boards[0][3].called = true;
+// boards[0][4].called = true;
+// boards[0][5].called = true;
+// boards[0][6].called = true;
+// boards[0][7].called = true;
+// boards[0][8].called = true;
+// boards[0][9].called = true;
+// boards[0][10].called = true;
+// boards[0][11].called = true;
+// boards[0][12].called = true;
+// boards[0][13].called = true;
+// boards[0][15].called = true;
+// boards[0][20].called = true;
+// console.log(boards[0])
+
+// checkSingleBoardForWinner(boards[0]);
+// console.log(checkSingleBoardForWinner(boards[0]))
+
+// function checkAllBoardsForWinner(boards) {
+//   let winner = false;
+
+// // console.log(boards);
+
+//   for (let i = 0; i < boards.length; i++) {
+//     winner = checkSingleBoardForWinner(boards[i]);
+//     checkSingleBoardForWinner(boards[i]);
+//   }
+// }
+
+// checkAllBoardsForWinner(boards);
