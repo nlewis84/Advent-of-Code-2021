@@ -1,132 +1,96 @@
 const { aoc_input } = require('../config');
 const fs = require('fs');
-const input = fs
-  .readFileSync(`${aoc_input}`, 'utf-8')
-  .split(' | ')
-  .map((pattern) => {
-    return pattern.split('\n');
-  })
-  .flat()
-  .map((pattern) => {
-    return pattern.split(' ');
-  });
+const heightMap = fs.readFileSync(`${aoc_input}`, 'utf-8').split('\n');
 
-const signalPatterns = input.filter((pattern, i) => {
-  return i % 2 === 0;
-});
+function indexOfSmallest(arr) {
+  let lowest = 0;
 
-const digitalOutput = input.filter((pattern, i) => {
-  return i % 2 === 1;
-});
+  if (!arr.every((val) => val === arr[0])) {
+    for (let i = 1; i < arr.length; i++) {
+      if (arr[i] < arr[lowest]) lowest = i;
+    }
 
-const signalPatternsOrdered = signalPatterns.sort(
-  (a, b) => a.length - b.length
-);
-
-function sortString(str) {
-  var arr = str.split('');
-  var sorted = arr.sort();
-  return sorted.join('');
-}
-
-function removeDuplicate(str) {
-  return str
-    .split('')
-    .filter(function (item, pos, self) {
-      return self.indexOf(item) == pos;
-    })
-    .join('');
-}
-
-let truthChecker = (arr) => arr.every((v) => v === true);
-
-let sortedDigitalOutput = digitalOutput
-  .flat()
-  .filter(
-    (item) =>
-      item.length === 2 ||
-      item.length === 3 ||
-      item.length === 4 ||
-      item.length === 7
-  );
-
-let answer = [];
-
-function part2() {
-  for (let i = 0; i < digitalOutput.length; i++) {
-    answer.push(
-      digitalOutput[i].map((item) => {
-        let one = signalPatternsOrdered[i].filter(
-          (item) => item.length === 2
-        )[0];
-        let four = signalPatternsOrdered[i].filter(
-          (item) => item.length === 4
-        )[0];
-        let seven = signalPatternsOrdered[i].filter(
-          (item) => item.length === 3
-        )[0];
-        let eight = signalPatternsOrdered[i].filter(
-          (item) => item.length === 7
-        )[0];
-        let nine = removeDuplicate(four + seven);
-        let isItNine;
-        let isItSix;
-        let isItTwo;
-        let isItFive;
-
-        switch (item.length) {
-          case 2:
-            return '1';
-          case 4:
-            return '4';
-          case 3:
-            return '7';
-          case 7:
-            return '8';
-          case 5:
-            // 2 should be missing two characters from 9
-            isItTwo = nine.split('').map((char) => item.includes(char));
-            if (isItTwo.filter((item) => item === false).length === 2) {
-              return '2';
-            }
-
-            // 5 should be missing 1 character compared to the 7 string
-            isItFive = seven.split('').map((char) => item.includes(char));
-            if (isItFive.filter((item) => item === false).length === 1) {
-              return '5';
-            }
-
-            return '3';
-          case 6:
-            isItSix = seven.split('').map((char) => item.includes(char));
-            // check to see if the item is missing only 1 character compared to the 7 string
-            if (isItSix.filter((item) => item === false).length === 1) {
-              return '6';
-            }
-
-            isItNine = nine.split('').map((char) => item.includes(char));
-            if (truthChecker(isItNine)) {
-              return '9';
-            }
-
-            return '0';
-          default:
-            return console.log('there is a problem');
-        }
-      })
-    );
+    return lowest;
+  } else {
+    return 3;
   }
-
-  // Sum the answer
-  console.log(
-    answer
-      .map((item) =>
-        item.join().replace(',', '').replace(',', '').replace(',', '')
-      )
-      // .flat()
-      .map((item) => parseInt(item))
-      .reduce((a, b) => a + b, 0)
-  );
 }
 
-part2();
+let points = [];
+
+const lowPoints = () => {
+  for (let index = 0; index < heightMap.length; index++) {
+    let prevRow = heightMap[index - 1];
+    let row = heightMap[index];
+    let nextRow = heightMap[index + 1];
+
+    console.log(index, row);
+    for (let j = 0; j < row.length; j++) {
+      const leftHeight = row[j - 1] || '9';
+      const currentHeight = row[j];
+      const rightHeight = row[j + 1] || '9';
+      const upperHeight = prevRow ? prevRow[j] : '9';
+      const lowerHeight = nextRow ? nextRow[j] : '9';
+      const heights = [
+        currentHeight,
+        lowerHeight,
+        upperHeight,
+        leftHeight,
+        rightHeight,
+      ];
+
+      if (indexOfSmallest(heights) === 0) {
+        points.push(parseInt(currentHeight) + 1);
+        // // left
+        if (row[j - 1] && heights[3] !== '9') {
+          points.push(parseInt(heights[3]));
+          individualHeightChecker(index, j - 1, j);
+        } else {
+          null;
+        }
+        // // right
+        if (row[j + 1] && heights[4] !== '9') {
+          points.push(parseInt(heights[4]));
+          individualHeightChecker(index, j + 1, j);
+        } else {
+          null;
+        }
+        // row[j + 1] ? individualHeightChecker(index, j + 1) : null;
+        // // upper
+        if (prevRow && heights[2] !== '9') {
+          points.push(parseInt(heights[2]));
+          individualHeightChecker(index - j, j, j);
+        } else {
+          null;
+        }
+        // prevRow ? individualHeightChecker(index - 1, j) : null;
+        // // lower
+        // nextRow ? individualHeightChecker(index + 1, j) : null;
+      }
+    }
+    console.log(points);
+  }
+  console.log(points.reduce((a, b) => a + b, 0));
+};
+
+const individualHeightChecker = (fullMapIndex, index, j) => {
+  // prevRow = heightMap[fullMapIndex - 1];
+  // row = heightMap[fullMapIndex];
+  // nextRow = heightMap[fullMapIndex + 1];
+  // const leftHeight = row[index - 1] || '9';
+  // const currentHeight = row[index];
+  // const rightHeight = row[index + 1] || '9';
+  // const upperHeight = prevRow ? prevRow[index] : '9';
+  // const lowerHeight = nextRow ? nextRow[index] : '9';
+  // const heights = [
+  //   currentHeight,
+  //   lowerHeight,
+  //   upperHeight,
+  //   leftHeight,
+  //   rightHeight,
+  // ];
+  // console.log(prevRow, row, nextRow, heights);
+  console.log('ind Height Checker', fullMapIndex, index, j);
+};
+
+lowPoints();
