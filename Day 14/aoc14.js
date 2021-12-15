@@ -12,8 +12,6 @@ for (let i = 0; i < insertionRules.length; i++) {
   rules[pair] = single;
 }
 
-// console.log(rules);
-
 function doesThisPairExist(object, key, num) {
   const amount = num === undefined ? 1 : num;
 
@@ -31,14 +29,11 @@ function polymerize(pairs) {
   for (let pair in pairs) {
     const insert = rules[pair];
 
-    // console.log(insert);
     doesThisPairExist(result, pair[0] + insert, pairs[pair]);
     doesThisPairExist(result, insert + pair[1], pairs[pair]);
   }
   return result;
 }
-
-// console.log(template);
 
 // count the intial pairs from the template
 let pairs = template
@@ -47,18 +42,14 @@ let pairs = template
   .slice(0, -1) // get rid of undefined at the end
   .reduce((obj, v) => doesThisPairExist(obj, v), {});
 
-// console.log(pairs);
-
 polymerize(pairs);
 
-for (let i = 0; i < 10; ++i) pairs = polymerize(pairs);
-
-// console.log(pairs);
+for (let i = 0; i < 10; i++) pairs = polymerize(pairs);
 
 let letterCount = {};
+
 // add up all letters from all pairs
 for (let pair in pairs) {
-  // console.log(pair[0]);
   doesThisPairExist(letterCount, pair[0], pairs[pair]);
   doesThisPairExist(letterCount, pair[1], pairs[pair]);
 }
@@ -76,8 +67,7 @@ for (let letter in letterCount) {
 letterCount[firstletter] += 1;
 letterCount[lastletter] += 1;
 
-console.log(letterCount);
-
 const sortedLetterCount = Object.values(letterCount).sort((a, b) => a - b);
 
+console.log(letterCount);
 console.log(sortedLetterCount.pop() - sortedLetterCount.shift());
